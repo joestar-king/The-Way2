@@ -1,0 +1,604 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
+<meta name="theme-color" content="#08101b">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="apple-mobile-web-app-title" content="The Way">
+<link rel="manifest" href="manifest.webmanifest">
+<link rel="apple-touch-icon" href="icon-192.png">
+
+<style>:root{
+  --ink:#0a111c; --navy:#101a29; --navy2:#162337; --gold:#dba646; --gold2:#f0c66e;
+  --paper:#ead29a; --paper2:#d5b56e; --paper3:#f3deb0; --red:#9e2927; --green:#1d7a44;
+}
+*{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+html,body{margin:0;min-height:100%;background:#060b12;color:#f7e7b8;font-family:Georgia,"Times New Roman",serif}
+body{display:flex;justify-content:center;overscroll-behavior:none}
+button,input,select{font:inherit}
+button{cursor:pointer}
+#app{width:min(100vw,640px);min-height:100vh;background:#080f19;position:relative;overflow-x:hidden}
+.screen{display:none;min-height:100vh;background:#080f19}.screen.active{display:block}
+.design{position:relative;width:100%;overflow:hidden;background:#080f19}.design>img.ref{display:block;width:100%;height:auto;user-select:none;-webkit-user-drag:none;pointer-events:none}
+.finance-design{aspect-ratio:941/1672}.way-design{aspect-ratio:1024/1536}
+.hot{position:absolute;background:transparent;border:0;z-index:15;padding:0}
+.hot:active{background:rgba(255,211,101,.12)}
+.pixel-panel{background:linear-gradient(180deg,#efd9a5,#dfc184);border:3px solid #24170b;outline:2px solid #8c642d;box-shadow:inset 0 0 0 2px #f8e8c0,0 3px 0 #05080d;color:#24180f}
+.dark-panel{background:#0d1623;border:2px solid #080c12;outline:2px solid #79552b;color:#ffe2a2;box-shadow:inset 0 0 0 1px #bd8a3d}
+/* Finance live overlays */
+#monthPatch{position:absolute;z-index:10;left:79.8%;top:1.25%;width:17.4%;height:6.8%;display:flex;align-items:center;justify-content:center;text-align:center;background:#ead7aa;color:#312112;border:2px solid #7e5a31;font-size:clamp(9px,2.4vw,14px);line-height:1.35}
+.profileCounter{position:absolute;z-index:11;left:2.8%;width:13%;height:2.6%;display:flex;align-items:center;justify-content:flex-end;padding-right:7%;font-weight:700;font-size:clamp(10px,3vw,17px);background:#111b2a;color:#f1d18a}
+#goldCounter{top:8.15%}#xpCounter{top:10.65%}#relicCounter{top:13.1%}
+#goldValuePatch{position:absolute;z-index:10;left:16.5%;top:39.7%;width:44%;height:4.7%;display:flex;align-items:center;background:#ead29a;color:#15120f;font-weight:700;font-size:clamp(24px,7.2vw,50px);letter-spacing:.02em}
+#goldBarPatch{position:absolute;z-index:10;left:17.3%;top:44.0%;width:43.1%;height:1.85%;background:#2a1e14;border:2px solid #1c130d;box-shadow:inset 0 0 0 2px #7c5426;padding:3px}.goldFill{height:100%;width:0;background:#29a34f;transition:width .25s ease}
+.metricPatch{position:absolute;z-index:10;top:49.1%;height:2.7%;display:flex;align-items:center;justify-content:center;background:#e9d09a;font-size:clamp(11px,3.1vw,19px);font-weight:700}
+#receivedPatch{left:10.8%;width:15.5%;color:#14703c}#commitPatch{left:30.2%;width:16%;color:#a11f20}#spendPatch{left:49.6%;width:14.5%;color:#a11f20}
+#categoryPanel{position:absolute;z-index:9;left:1.65%;top:54.25%;width:63.7%;height:19.25%;padding:2.2% 3% 2%;overflow:hidden}
+.categoryHead{display:flex;align-items:center;justify-content:space-between;font-weight:700;font-size:clamp(13px,3.6vw,22px);margin-bottom:2%}.categoryHead button{background:#efd9a5;border:2px solid #ae8346;padding:4px 10px;color:#3d2a16}
+.catRows{display:grid;gap:1.6%}.catRow{display:grid;grid-template-columns:27% 17% 1fr 11%;align-items:center;gap:2%;font-size:clamp(10px,2.7vw,17px)}.catBar{height:clamp(8px,2vw,14px);background:#d6b87d;border:1px solid #c39b58}.catFill{height:100%;background:#aa2f2c}.catRow:nth-child(2) .catFill{background:#247bb0}.catRow:nth-child(3) .catFill{background:#279548}.catRow:nth-child(4) .catFill{background:#dd920f}.catRow:nth-child(5) .catFill{background:#7c43ad}
+#lowerPanel{position:absolute;z-index:9;left:1.55%;top:74.12%;width:96.7%;height:10.25%;display:grid;grid-template-columns:37% 1fr;gap:1.4%;background:transparent;color:#25170e}
+.lowerCard{height:100%;padding:5% 5%;overflow:hidden}.lowerTitle{font-weight:700;font-size:clamp(12px,3.2vw,20px);margin-bottom:4%}.largestBody{display:flex;align-items:center;gap:9%;font-size:clamp(10px,2.8vw,17px)}.largestIcon{font-size:clamp(25px,7vw,46px)}.recentRows{display:grid;gap:3%;font-size:clamp(8px,2.2vw,14px)}.recentRow{display:grid;grid-template-columns:1fr auto auto;gap:4%;align-items:center}.recentRow .amt{color:#a11f20;font-weight:700}.recentRow.income .amt{color:#137440}
+.routeMarker{position:absolute;z-index:14;width:6.3%;aspect-ratio:1;border-radius:50%;border:3px solid #ffd65e;background:#101928 center/cover no-repeat;box-shadow:0 0 0 3px #6b321a,0 0 18px #ffd559;transition:left .7s cubic-bezier(.2,.8,.2,1),top .7s cubic-bezier(.2,.8,.2,1);transform:translate(-50%,-50%);pointer-events:none}
+.routeMarker:after{content:"";position:absolute;left:50%;bottom:-17%;transform:translateX(-50%);width:22%;height:22%;background:#ffe077;border-radius:50%}
+/* Finance hotspots */
+#hMarket{left:66.1%;top:36.2%;width:31.7%;height:7.6%}#hBig{left:66.1%;top:43.7%;width:31.7%;height:7%}#hIncome{left:66.1%;top:50.8%;width:31.7%;height:7%}#hFixed{left:66.1%;top:58%;width:31.7%;height:7%}
+#hPdf{left:1.8%;top:85.7%;width:48.5%;height:5.2%}#hBackup{left:50.4%;top:85.7%;width:47.6%;height:5.2%}
+#hNavVillage{left:0;top:90.7%;width:20%;height:9.3%}#hNavActivity{left:20%;top:90.7%;width:20%;height:9.3%}#hNavFinance{left:40%;top:90.7%;width:20%;height:9.3%}#hNavWay{left:60%;top:90.7%;width:20%;height:9.3%}#hNavSettings{left:80%;top:90.7%;width:20%;height:9.3%}
+#hSpotVillage{left:8%;top:27%;width:17%;height:7%}#hSpotMarket{left:29%;top:24%;width:22%;height:7%}#hSpotIncome{left:48%;top:14%;width:20%;height:7%}#hSpotBig{left:65%;top:16%;width:25%;height:7%}#hSpotFixed{left:54%;top:25%;width:25%;height:7%}#hSpotLedger{left:82%;top:24%;width:17%;height:7%}
+#hMonth{left:79%;top:0;right:0;height:8%}
+/* The Way exact reference */
+.wayDesignWrap{padding-bottom:12px}
+#wayProgressPatch{position:absolute;z-index:12;left:22.2%;top:4.0%;width:20%;height:4.9%;background:#101a29;color:#f2d79b;padding:0.2% 1%;font-size:clamp(10px,2.7vw,17px);line-height:1.45}
+#wayProgressPatch b{display:block;font-size:1.15em}.miniXp{height:7px;background:#19202b;border:1px solid #aa7a36;margin-top:3px}.miniXp>div{height:100%;background:#dca93f;width:0}
+#hWayPortrait{left:0;top:0;width:22%;height:16%}#hQuest{left:0;top:16.7%;width:22%;height:7.6%}#hSkills{left:0;top:24.5%;width:22%;height:7%}#hItems{left:0;top:31.5%;width:22%;height:7%}#hEquipment{left:0;top:38.5%;width:22%;height:7%}#hStatus{left:0;top:45.5%;width:22%;height:7%}#hMap{left:0;top:52.5%;width:22%;height:7%}#hLore{left:0;top:59.5%;width:22%;height:7%}
+#hViewDetails{left:62%;top:55.3%;width:17%;height:5%}#hWorldMap{left:1%;top:61.6%;width:24%;height:4.5%}#hLocalMap{left:25%;top:61.6%;width:20%;height:4.5%}
+/* Modal */
+.modal{position:fixed;inset:0;z-index:100;display:none;align-items:flex-end;justify-content:center;background:rgba(0,0,0,.76);padding:max(12px,env(safe-area-inset-top)) 12px max(12px,env(safe-area-inset-bottom))}.modal.open{display:flex}
+.sheet{width:min(620px,100%);max-height:89vh;overflow:auto;background:#e5c887;color:#23170e;border:4px solid #16100a;outline:2px solid #9d7334;box-shadow:inset 0 0 0 2px #f4dfa8,0 -6px 0 #080b10;padding:16px}
+.sheetHead{display:flex;justify-content:space-between;gap:12px;align-items:center;border-bottom:2px solid #9c7745;padding-bottom:9px;margin-bottom:12px}.sheetHead h2{margin:0;font-size:22px}.closeBtn{background:#111b2a;color:#f2d18a;border:2px solid #7e5b2b;padding:7px 10px}
+.formGrid{display:grid;gap:10px}.field label{display:block;font-size:12px;font-weight:700;margin-bottom:4px}.field input,.field select{width:100%;padding:11px;border:2px solid #7f5b32;background:#fff0c2;color:#21160d;border-radius:0}.checkline{display:flex;align-items:center;gap:9px;background:#d3b26f;padding:10px;border:2px solid #9b7540}.checkline input{width:20px;height:20px}.primary,.secondary,.danger{padding:12px 15px;border:3px solid #27170b;box-shadow:inset 0 0 0 2px rgba(255,255,255,.25),0 3px 0 #07090d;font-weight:700}.primary{background:#e4b94e;color:#20150c}.secondary{background:#142033;color:#f1d399}.danger{background:#8d2c27;color:#ffe2bd}.actionsRow{display:flex;gap:9px;flex-wrap:wrap;margin-top:12px}.actionsRow>*{flex:1}
+.recordList{margin-top:15px;border-top:2px solid #9b7440}.record{display:grid;grid-template-columns:1fr auto;gap:8px;padding:10px 0;border-bottom:1px dashed #9c7745}.record small{display:block;opacity:.72}.record .right{text-align:right;font-weight:700}.record button{margin-top:5px;font-size:11px;padding:5px 7px;background:#182335;color:#f2d29a;border:1px solid #7e5a2e}
+.questModal .sheet{background:#e8ce91}.questStory{line-height:1.55}.puzzleBox{margin-top:14px;padding:12px;background:#c9a566;border:3px solid #6f4a22}.symbolGrid{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin:12px 0}.symbol{padding:14px 0;background:#101a29;color:#f2cc70;border:3px solid #735024;font-size:28px}.symbol.selected{background:#7b2b27}.sequence{min-height:32px;padding:7px;background:#f0d89f;border:2px solid #99703a}.reward{margin-top:10px;padding:10px;background:#111b28;color:#f0d392;border:2px solid #8a642f}
+.toast{position:fixed;z-index:150;left:50%;bottom:24px;transform:translateX(-50%) translateY(20px);opacity:0;background:#111b29;color:#f4d693;border:2px solid #b07d32;padding:10px 16px;max-width:90vw;text-align:center;transition:.2s;pointer-events:none}.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.backHint{position:fixed;left:50%;bottom:12px;transform:translateX(-50%);z-index:60;background:#111b29e8;color:#f3d290;border:2px solid #9b6d2f;padding:7px 11px;font-size:11px;display:none}.backHint.show{display:block}
+@media (min-width:641px){body{padding:18px 0}#app{box-shadow:0 0 40px #000;border:2px solid #6f4c22}}
+
+/* v5.1 finance panel corrections */
+#goldValuePatch{
+  left:16.45%;
+  top:39.78%;
+  width:44.5%;
+  height:4.05%;
+  justify-content:flex-start;
+  padding-left:.3%;
+  background:linear-gradient(180deg,rgba(239,216,163,.985),rgba(233,205,145,.985));
+  line-height:1;
+  white-space:nowrap;
+  overflow:hidden;
+}
+#goldBarPatch{
+  left:17.15%;
+  top:43.92%;
+  width:43.45%;
+  height:1.82%;
+}
+
+/* Replace the three floating number patches with one visually aligned row.
+   The original artwork frame stays visible around the row. */
+.metricPatch{
+  top:47.55%;
+  height:5.15%;
+  display:flex;
+  flex-direction:column;
+  align-items:center;
+  justify-content:center;
+  gap:.18em;
+  padding:.3% .6%;
+  background:linear-gradient(180deg,rgba(238,214,160,.985),rgba(226,195,132,.985));
+  border-top:1px solid rgba(124,84,39,.40);
+  border-bottom:1px solid rgba(255,242,203,.45);
+  font-size:inherit;
+  line-height:1.05;
+  overflow:hidden;
+}
+.metricPatch .metricLabel{
+  display:block;
+  color:#2b1a0e;
+  font-size:clamp(8px,2.25vw,14px);
+  font-weight:700;
+  white-space:nowrap;
+}
+.metricPatch strong{
+  display:block;
+  font-size:clamp(10px,3vw,18px);
+  white-space:nowrap;
+  letter-spacing:-.01em;
+}
+#receivedCell{left:8.2%;width:17.3%}
+#commitCell{left:27.6%;width:18.4%}
+#spendCell{left:47.8%;width:16.9%}
+#receivedPatch{color:#14703c}
+#commitPatch,#spendPatch{color:#a11f20}
+
+/* Use the artwork's existing outer frame instead of drawing a second card.
+   This keeps the section from looking pasted on top. */
+#categoryPanel{
+  left:2.0%;
+  top:54.55%;
+  width:62.25%;
+  height:18.55%;
+  padding:2.15% 2.7% 1.75%;
+  overflow:hidden;
+  display:flex;
+  flex-direction:column;
+  background:
+    linear-gradient(rgba(237,213,158,.975),rgba(229,199,139,.975)),
+    repeating-linear-gradient(0deg,transparent 0 4px,rgba(94,58,24,.025) 4px 5px);
+  border:0;
+  outline:0;
+  box-shadow:none;
+  color:#28190e;
+}
+#categoryPanel.pixel-panel{
+  border:0;
+  outline:0;
+  box-shadow:none;
+}
+.categoryHead{
+  flex:0 0 auto;
+  display:grid;
+  grid-template-columns:minmax(0,1fr) auto;
+  align-items:center;
+  gap:3%;
+  margin:0;
+  padding:0 0 2.1%;
+  border-bottom:1px solid rgba(122,82,37,.32);
+  font-size:clamp(10px,3.05vw,19px);
+  line-height:1.05;
+}
+.categoryHead>span{
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:clip;
+}
+.categoryHead button{
+  min-width:0;
+  white-space:nowrap;
+  padding:3px 8px;
+  line-height:1.15;
+  font-size:clamp(8px,2.4vw,14px);
+  background:#ead09a;
+  border:1px solid #a47a3c;
+  box-shadow:inset 0 0 0 1px rgba(255,245,207,.5);
+}
+.catRows{
+  flex:1 1 auto;
+  min-height:0;
+  display:grid;
+  grid-template-rows:repeat(5,minmax(0,1fr));
+  gap:0;
+  align-items:stretch;
+  margin-top:1.4%;
+}
+.catRow{
+  min-height:0;
+  display:grid;
+  grid-template-columns:30% 19% minmax(0,1fr) 9%;
+  align-items:center;
+  gap:2%;
+  padding:0;
+  font-size:clamp(8px,2.35vw,14px);
+  line-height:1;
+}
+.catRow>span:first-child,
+.catRow>span:nth-child(2),
+.catRow>b{white-space:nowrap}
+.catRow>span:nth-child(2){text-align:right}
+.catRow>b{text-align:right;font-size:.95em}
+.catBar{
+  width:100%;
+  height:clamp(6px,1.65vw,11px);
+  align-self:center;
+}
+
+/* Slightly reduce narrow-phone type to prevent the last category from clipping. */
+@media (max-width:380px){
+  .categoryHead{font-size:11px}
+  .categoryHead button{font-size:9px;padding:2px 6px}
+  .catRow{font-size:9px;grid-template-columns:30% 18% minmax(0,1fr) 10%}
+  .metricPatch .metricLabel{font-size:8px}
+  .metricPatch strong{font-size:11px}
+}
+
+
+/* v5.1.1: integrate the three metrics into one continuous parchment band */
+#metricBand{
+  position:absolute;
+  z-index:10;
+  left:5.1%;
+  top:47.15%;
+  width:59.7%;
+  height:5.65%;
+  display:grid;
+  grid-template-columns:repeat(3,minmax(0,1fr));
+  align-items:stretch;
+  background:linear-gradient(180deg,rgba(239,216,163,.992),rgba(226,195,132,.992));
+  border-top:1px solid rgba(124,84,39,.45);
+  border-bottom:1px solid rgba(255,242,203,.42);
+  overflow:hidden;
+}
+#metricBand .metricPatch{
+  position:relative;
+  left:auto;
+  top:auto;
+  width:auto;
+  height:auto;
+  min-width:0;
+  background:transparent;
+  border:0;
+  border-right:1px solid rgba(124,84,39,.25);
+  padding:4% 2%;
+}
+#metricBand .metricPatch:last-child{border-right:0}
+#metricBand .metricLabel{font-size:clamp(8px,2.15vw,13px)}
+#metricBand .metricPatch strong{font-size:clamp(10px,2.85vw,17px)}
+#categoryPanel{
+  top:54.48%;
+  height:19.02%;
+}
+
+</style>
+<title>The Way</title>
+
+<style id="v52-overrides">
+/* v5.2 — finance cleanup: integrated profile stats and clean lower activity strip */
+.profileCounter{
+  left:2.15% !important;
+  width:14.65% !important;
+  height:2.75% !important;
+  justify-content:space-between !important;
+  padding:0 6% !important;
+  border-left:2px solid #6f4c27;
+  border-right:2px solid #6f4c27;
+  background:linear-gradient(180deg,rgba(13,22,35,.985),rgba(9,16,27,.985)) !important;
+  color:#f4d58f !important;
+  font-size:clamp(8px,2.35vw,14px) !important;
+  letter-spacing:.01em;
+  text-shadow:0 1px 0 #000;
+}
+.profileCounter::before{
+  font-size:clamp(7px,1.9vw,11px);
+  color:#d6b36a;
+  font-weight:700;
+  letter-spacing:.02em;
+}
+#goldCounter{top:8.25% !important;border-top:2px solid #6f4c27}
+#xpCounter{top:10.95% !important}
+#relicCounter{top:13.65% !important;border-bottom:2px solid #6f4c27}
+#goldCounter::before{content:"🪙"}
+#xpCounter::before{content:"✦ XP"}
+#relicCounter::before{content:"◆"}
+
+#lowerPanel{
+  left:1.35% !important;
+  top:73.72% !important;
+  width:97.15% !important;
+  height:11.58% !important;
+  padding:.72% !important;
+  gap:1.25% !important;
+  grid-template-columns:37% 1fr !important;
+  background:linear-gradient(180deg,#d8b973,#cda862) !important;
+  border:3px solid #21150b;
+  outline:2px solid #8e642d;
+  box-shadow:inset 0 0 0 2px #f4dda5,0 3px 0 #05080d;
+  overflow:hidden !important;
+}
+#lowerPanel .lowerCard{
+  min-width:0;
+  height:100% !important;
+  margin:0 !important;
+  padding:5.5% 5.5% !important;
+  border-width:2px !important;
+  outline-width:1px !important;
+  box-shadow:inset 0 0 0 1px #f7e5ba !important;
+  overflow:hidden !important;
+}
+#lowerPanel .lowerTitle{
+  margin:0 0 5% !important;
+  line-height:1.05;
+}
+#lowerPanel .largestBody{
+  align-items:center !important;
+  min-height:55%;
+}
+#lowerPanel .recentRows{
+  height:calc(100% - 25px);
+  overflow:hidden;
+  align-content:start;
+}
+</style>
+
+
+<style id="v53-overrides">
+/* v5.3 — number-fit fixes for finance metrics */
+#metricBand{
+  left:4.92% !important;
+  width:60.25% !important;
+  top:47.05% !important;
+  height:6.3% !important;
+}
+#metricBand .metricPatch{
+  display:flex !important;
+  flex-direction:column !important;
+  justify-content:center !important;
+  align-items:center !important;
+  text-align:center !important;
+  padding:2.4% 1.4% !important;
+}
+#metricBand .metricLabel{
+  font-size:clamp(7px,1.75vw,11px) !important;
+  line-height:1.05 !important;
+  margin-bottom:3px !important;
+  white-space:nowrap !important;
+}
+#metricBand .metricPatch strong{
+  display:block !important;
+  width:100% !important;
+  font-size:clamp(8px,1.95vw,14px) !important;
+  line-height:1.0 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+  text-overflow:clip !important;
+  letter-spacing:-.02em !important;
+}
+#goldValuePatch{
+  width:44.9% !important;
+  font-size:clamp(21px,6.35vw,47px) !important;
+  line-height:1 !important;
+  white-space:nowrap !important;
+  overflow:hidden !important;
+}
+#goldValuePatch.fitSmall{font-size:clamp(17px,5.2vw,36px) !important;}
+#goldValuePatch.fitTiny{font-size:clamp(14px,4.5vw,30px) !important;}
+</style>
+
+</head>
+<body>
+<div id="app">
+  <section id="financeScreen" class="screen active">
+    <div class="design finance-design" id="financeDesign">
+      <img class="ref" src="finance-screen.png" alt="The Way finance interface">
+      <div id="monthPatch">Oct 2026<br>Morocco</div>
+      <div class="profileCounter" id="goldCounter">0</div>
+      <div class="profileCounter" id="xpCounter">0</div>
+      <div class="profileCounter" id="relicCounter">0</div>
+      <div id="goldValuePatch"><span id="goldLeft">0</span>&nbsp;MAD</div>
+      <div id="goldBarPatch"><div class="goldFill" id="goldFill"></div></div>
+      <div id="metricBand">
+        <div class="metricPatch" id="receivedCell"><span class="metricLabel">Received</span><strong id="receivedPatch">0 MAD</strong></div>
+        <div class="metricPatch" id="commitCell"><span class="metricLabel">Commitments</span><strong id="commitPatch">0 MAD</strong></div>
+        <div class="metricPatch" id="spendCell"><span class="metricLabel">Spending</span><strong id="spendPatch">0 MAD</strong></div>
+      </div>
+      <div id="categoryPanel" class="pixel-panel"></div>
+      <div id="lowerPanel"></div>
+      <div class="routeMarker" id="routeMarker" style="background-image:url('route-marker.png')"></div>
+      <button class="hot" id="hMarket" aria-label="Market"></button><button class="hot" id="hBig" aria-label="Big Purchases"></button><button class="hot" id="hIncome" aria-label="Income"></button><button class="hot" id="hFixed" aria-label="Fixed Charges"></button>
+      <button class="hot" id="hPdf" aria-label="Export PDF"></button><button class="hot" id="hBackup" aria-label="Backup"></button>
+      <button class="hot" id="hNavVillage" aria-label="Village"></button><button class="hot" id="hNavActivity" aria-label="Activity"></button><button class="hot" id="hNavFinance" aria-label="Finance"></button><button class="hot" id="hNavWay" aria-label="The Way"></button><button class="hot" id="hNavSettings" aria-label="Settings"></button>
+      <button class="hot" id="hSpotVillage" aria-label="Village map"></button><button class="hot" id="hSpotMarket" aria-label="Market map"></button><button class="hot" id="hSpotIncome" aria-label="Income map"></button><button class="hot" id="hSpotBig" aria-label="Big Purchases map"></button><button class="hot" id="hSpotFixed" aria-label="Fixed Charges map"></button><button class="hot" id="hSpotLedger" aria-label="Ledger map"></button><button class="hot" id="hMonth" aria-label="Change month"></button>
+    </div>
+  </section>
+
+  <section id="wayScreen" class="screen">
+    <div class="wayDesignWrap">
+      <div class="design way-design" id="wayDesign">
+        <img class="ref" src="way-screen.png" alt="Tangier RPG Quest Interface">
+        <div id="wayProgressPatch"><b id="wayLevel">Lv. 1</b><span id="wayXpText">0 / 100</span><div class="miniXp"><div id="wayXpFill"></div></div></div>
+        <button class="hot" id="hWayPortrait" aria-label="Return to Finance"></button><button class="hot" id="hQuest"></button><button class="hot" id="hSkills"></button><button class="hot" id="hItems"></button><button class="hot" id="hEquipment"></button><button class="hot" id="hStatus"></button><button class="hot" id="hMap"></button><button class="hot" id="hLore"></button><button class="hot" id="hViewDetails"></button><button class="hot" id="hWorldMap"></button><button class="hot" id="hLocalMap"></button>
+      </div>
+    </div>
+  </section>
+</div>
+
+<div class="modal" id="modal"><div class="sheet" id="sheet"></div></div>
+<div class="toast" id="toast"></div>
+<div class="backHint" id="backHint">Tap Issam's portrait to return to Finance</div>
+<script>(() => {
+  'use strict';
+  const $ = s => document.querySelector(s);
+  const $$ = s => [...document.querySelectorAll(s)];
+  const KEY='theway.app.v5';
+  const now = new Date();
+  const currentMonthKey = `${now.getFullYear()}-${String(now.getMonth()+1).padStart(2,'0')}`;
+  const blankMonth=()=>({income:[],fixed:[],market:[],big:[]});
+  const blankState=()=>({activeMonth:currentMonthKey,months:{[currentMonthKey]:blankMonth()},xp:0,relics:0,puzzleDone:false,fragment:false,route:'village'});
+  let state;
+  try{ state=Object.assign(blankState(),JSON.parse(localStorage.getItem(KEY)||'{}')); }catch{ state=blankState(); }
+  if(!state.months) state.months={};
+  if(!state.activeMonth) state.activeMonth=currentMonthKey;
+  if(!state.months[state.activeMonth]) state.months[state.activeMonth]=blankMonth();
+  let puzzleSeq=[];
+
+  function month(){ if(!state.months[state.activeMonth]) state.months[state.activeMonth]=blankMonth(); return state.months[state.activeMonth]; }
+  function save(){ localStorage.setItem(KEY,JSON.stringify(state)); render(); }
+  function money(n){ const x=Math.round((Number(n)||0)*100)/100; return x.toLocaleString('en-US',{maximumFractionDigits:2}); }
+  function today(){ return new Date().toISOString().slice(0,10); }
+  function monthLabel(key){ const [y,m]=key.split('-').map(Number); return new Date(y,m-1,1).toLocaleDateString('en-US',{month:'short',year:'numeric'}); }
+  function totals(){
+    const m=month();
+    const received=m.income.filter(x=>x.received).reduce((a,x)=>a+Number(x.amount||0),0);
+    const expected=m.income.reduce((a,x)=>a+Number(x.amount||0),0);
+    const fixed=m.fixed.reduce((a,x)=>a+Number(x.amount||0),0);
+    const market=m.market.reduce((a,x)=>a+Number(x.amount||0),0);
+    const big=m.big.reduce((a,x)=>a+Number(x.amount||0),0);
+    const spending=market+big;
+    const gold=received===0?0:received-fixed-spending;
+    return {received,expected,fixed,market,big,spending,gold};
+  }
+  function esc(s){ return String(s??'').replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+  function id(){ return `${Date.now().toString(36)}${Math.random().toString(36).slice(2,7)}`; }
+  function toast(msg){ const el=$('#toast'); el.textContent=msg; el.classList.add('show'); clearTimeout(toast.t); toast.t=setTimeout(()=>el.classList.remove('show'),2100); }
+
+  function categoryStats(){
+    const m=month(); const map={Food:0,Transport:0,Housing:0,Personal:0,Other:0};
+    [...m.market,...m.big].forEach(x=>{ const c=map[x.category]!==undefined?x.category:'Other'; map[c]+=Number(x.amount||0); });
+    const total=Object.values(map).reduce((a,b)=>a+b,0);
+    return Object.entries(map).map(([name,amount])=>({name,amount,pct:total?Math.round(amount/total*100):0}));
+  }
+  function recentActivity(){
+    const m=month();
+    return [
+      ...m.market.map(x=>({...x,type:'Market',sign:-1})),
+      ...m.big.map(x=>({...x,type:'Big Purchase',sign:-1})),
+      ...m.fixed.map(x=>({...x,type:'Fixed Charge',sign:-1})),
+      ...m.income.filter(x=>x.received).map(x=>({...x,date:x.receivedDate||x.date,type:'Income',sign:1}))
+    ].sort((a,b)=>(b.date||'').localeCompare(a.date||'')).slice(0,4);
+  }
+  function largestExpense(){
+    const m=month(); const all=[...m.market.map(x=>({...x,type:'Market'})),...m.big.map(x=>({...x,type:'Big Purchase'}))];
+    return all.sort((a,b)=>Number(b.amount)-Number(a.amount))[0]||null;
+  }
+
+  function fitMoneyPatch(el, charsSmall=11, charsTiny=14){
+    if(!el) return;
+    const txt=(el.textContent||'').replace(/\s+/g,' ').trim();
+    el.classList.remove('fitSmall','fitTiny');
+    if(txt.length>=charsTiny) el.classList.add('fitTiny');
+    else if(txt.length>=charsSmall) el.classList.add('fitSmall');
+  }
+
+  function fitMetricValue(el){
+    if(!el) return;
+    const txt=(el.textContent||'').trim();
+    const len=txt.length;
+    if(len>=13) el.style.fontSize='clamp(7px,1.55vw,11px)';
+    else if(len>=11) el.style.fontSize='clamp(7.5px,1.7vw,12px)';
+    else if(len>=9) el.style.fontSize='clamp(8px,1.85vw,13px)';
+    else el.style.fontSize='clamp(8px,1.95vw,14px)';
+  }
+
+  function render(){
+    const t=totals();
+    $('#goldCounter').textContent=money(t.gold);
+    $('#xpCounter').textContent=state.xp||0;
+    $('#relicCounter').textContent=state.relics||0;
+    $('#goldLeft').textContent=money(t.gold);
+    $('#receivedPatch').textContent=`${money(t.received)} MAD`;
+    $('#commitPatch').textContent=`${money(t.fixed)} MAD`;
+    $('#spendPatch').textContent=`${money(t.spending)} MAD`;
+    fitMoneyPatch($('#goldValuePatch'));
+    fitMetricValue($('#receivedPatch'));
+    fitMetricValue($('#commitPatch'));
+    fitMetricValue($('#spendPatch'));
+    $('#goldFill').style.width=(t.received?Math.max(0,Math.min(100,t.gold/t.received*100)):0)+'%';
+    const [yy,mm]=state.activeMonth.split('-').map(Number);
+    $('#monthPatch').innerHTML=`Month ${mm}<br>${new Date(yy,mm-1,1).toLocaleString('en-US',{month:'short'})} ${yy}<br>Morocco`;
+    const cats=categoryStats();
+    $('#categoryPanel').innerHTML=`<div class="categoryHead"><span>🧾 &nbsp; Spending by Category</span><button data-ledger="1">View Details ›</button></div><div class="catRows">${cats.map(c=>`<div class="catRow"><span>${categoryIcon(c.name)} ${c.name}</span><span>${money(c.amount)} MAD</span><div class="catBar"><div class="catFill" style="width:${c.pct}%"></div></div><b>${c.pct}%</b></div>`).join('')}</div>`;
+    const largest=largestExpense(); const recent=recentActivity();
+    $('#lowerPanel').innerHTML=`<div class="lowerCard pixel-panel"><div class="lowerTitle">💰 &nbsp; Largest Expense</div><div class="largestBody"><span class="largestIcon">${largest?categoryIcon(largest.category):'—'}</span><span>${largest?`${esc(largest.desc)}<br><b style="color:#a11f20">${money(largest.amount)} MAD</b>`:'No spending yet'}</span></div></div><div class="lowerCard pixel-panel"><div class="lowerTitle">📜 &nbsp; Recent Activity</div><div class="recentRows">${recent.length?recent.map(x=>`<div class="recentRow ${x.sign>0?'income':''}"><span>${activityIcon(x.type)} ${esc(x.desc)}</span><span>${formatShortDate(x.date)}</span><span class="amt">${x.sign>0?'+':'-'}${money(x.amount)} MAD</span></div>`).join(''):'<div>No activity yet.</div>'}</div></div>`;
+    const lvl=Math.floor((state.xp||0)/100)+1, within=(state.xp||0)%100;
+    $('#wayLevel').textContent=`Lv. ${lvl}`; $('#wayXpText').textContent=`${within} / 100`; $('#wayXpFill').style.width=`${within}%`;
+    setRoute(state.route||'village',false);
+    const ledgerBtn=$('[data-ledger="1"]'); if(ledgerBtn) ledgerBtn.onclick=openLedger;
+  }
+  function categoryIcon(c){ return ({Food:'🍎',Transport:'🐎',Housing:'🏠',Personal:'👕',Other:'📦'})[c]||'📦'; }
+  function activityIcon(t){ return t==='Income'?'🪙':t==='Market'?'🛒':t==='Big Purchase'?'🧰':'📜'; }
+  function formatShortDate(d){ if(!d)return''; const dt=new Date(d+'T00:00:00'); return dt.toLocaleDateString('en-GB',{day:'2-digit',month:'short'}); }
+
+  const routePos={village:[17,29],market:[40,26],income:[54,16],big:[77,18],fixed:[65,28],ledger:[90,27]};
+  function setRoute(k,animate=true){ state.route=k; const p=routePos[k]||routePos.village; const mk=$('#routeMarker'); if(!animate)mk.style.transition='none'; mk.style.left=p[0]+'%'; mk.style.top=p[1]+'%'; if(!animate){void mk.offsetWidth;mk.style.transition='';} localStorage.setItem(KEY,JSON.stringify(state)); }
+  function travelThen(k,cb){ setRoute(k,true); setTimeout(()=>cb&&cb(),520); }
+
+  function showScreen(name){ $$('.screen').forEach(s=>s.classList.remove('active')); $('#'+name).classList.add('active'); window.scrollTo({top:0,behavior:'auto'}); if(name==='wayScreen'){ const hint=$('#backHint'); hint.classList.add('show'); setTimeout(()=>hint.classList.remove('show'),2600); } }
+
+  function openSheet(title,content,cls=''){ $('#sheet').className='sheet '+cls; $('#sheet').innerHTML=`<div class="sheetHead"><h2>${title}</h2><button class="closeBtn" id="closeSheet">✕</button></div>${content}`; $('#modal').classList.add('open'); $('#closeSheet').onclick=closeSheet; }
+  function closeSheet(){ $('#modal').classList.remove('open'); }
+  $('#modal').addEventListener('click',e=>{ if(e.target===$('#modal'))closeSheet(); });
+
+  function financeForm(type){
+    const m=month();
+    if(type==='income'){
+      openSheet('Income',`<form id="fIncome" class="formGrid"><div class="field"><label>Source / description</label><input id="inDesc" required placeholder="Salary, freelance…"></div><div class="field"><label>Expected amount (MAD)</label><input id="inAmt" required type="number" min="0" step="0.01"></div><div class="field"><label>Expected / received date</label><input id="inDate" required type="date" value="${today()}"></div><label class="checkline"><input type="checkbox" id="inReceived"> Mark this income as received now</label><button class="primary" type="submit">Save income</button></form><div class="recordList" id="incomeList"></div>`);
+      $('#fIncome').onsubmit=e=>{e.preventDefault();m.income.push({id:id(),desc:$('#inDesc').value.trim(),amount:Number($('#inAmt').value),date:$('#inDate').value,received:$('#inReceived').checked,receivedDate:$('#inReceived').checked?$('#inDate').value:null});save();financeForm('income');toast('Income saved');};
+      renderIncomeList();
+    }else if(type==='fixed'){
+      openSheet('Fixed Charges',`<form id="fFixed" class="formGrid"><div class="field"><label>Commitment</label><input id="fxDesc" required placeholder="Rent, internet…"></div><div class="field"><label>Amount (MAD)</label><input id="fxAmt" required type="number" min="0" step="0.01"></div><div class="field"><label>Due date</label><input id="fxDate" required type="date" value="${today()}"></div><button class="primary" type="submit">Add commitment</button></form><div class="recordList" id="fixedList"></div>`);
+      $('#fFixed').onsubmit=e=>{e.preventDefault();m.fixed.push({id:id(),desc:$('#fxDesc').value.trim(),amount:Number($('#fxAmt').value),date:$('#fxDate').value});save();financeForm('fixed');toast('Commitment added');};renderFixedList();
+    }else if(type==='market'||type==='big'){
+      const market=type==='market'; openSheet(market?'Market — Buy & Record':'Big Purchases',`<form id="fSpend" class="formGrid"><div class="field"><label>${market?'Purchase':'Purchase / expense'}</label><input id="spDesc" required placeholder="${market?'Groceries':'Laptop, furniture…'}"></div><div class="field"><label>Amount (MAD)</label><input id="spAmt" required type="number" min="0" step="0.01"></div><div class="field"><label>Purchase date</label><input id="spDate" required type="date" value="${today()}"></div><div class="field"><label>Category</label><select id="spCat"><option>Food</option><option>Transport</option><option>Housing</option><option>Personal</option><option>Other</option></select></div><button class="primary" type="submit">Record purchase</button></form><div class="recordList" id="spendList"></div>`);
+      $('#fSpend').onsubmit=e=>{e.preventDefault();m[type].push({id:id(),desc:$('#spDesc').value.trim(),amount:Number($('#spAmt').value),date:$('#spDate').value,category:$('#spCat').value});save();financeForm(type);toast(`Purchase saved for ${$('#spDate').value}`);};renderSpendList(type);
+    }
+  }
+  function renderIncomeList(){ const el=$('#incomeList'); if(!el)return; const list=month().income; el.innerHTML=list.length?list.map(x=>`<div class="record"><span><b>${esc(x.desc)}</b><small>${x.received?'Received '+formatShortDate(x.receivedDate):'Expected '+formatShortDate(x.date)}</small></span><span class="right">${money(x.amount)} MAD<br>${!x.received?`<button data-rec="${x.id}">Mark received</button>`:''}<button data-delinc="${x.id}">Delete</button></span></div>`).join(''):'<div class="record">No income entries yet.</div>'; $$('[data-rec]').forEach(b=>b.onclick=()=>{const x=list.find(v=>v.id===b.dataset.rec);if(x){x.received=true;x.receivedDate=today();save();financeForm('income');}}); $$('[data-delinc]').forEach(b=>b.onclick=()=>{month().income=month().income.filter(v=>v.id!==b.dataset.delinc);save();financeForm('income');}); }
+  function renderFixedList(){ const el=$('#fixedList');if(!el)return;const list=month().fixed;el.innerHTML=list.length?list.map(x=>`<div class="record"><span><b>${esc(x.desc)}</b><small>Due ${formatShortDate(x.date)}</small></span><span class="right">${money(x.amount)} MAD<br><button data-delfx="${x.id}">Delete</button></span></div>`).join(''):'<div class="record">No fixed charges yet.</div>';$$('[data-delfx]').forEach(b=>b.onclick=()=>{month().fixed=month().fixed.filter(v=>v.id!==b.dataset.delfx);save();financeForm('fixed');}); }
+  function renderSpendList(type){ const el=$('#spendList');if(!el)return;const list=month()[type].slice().sort((a,b)=>b.date.localeCompare(a.date));el.innerHTML=list.length?list.map(x=>`<div class="record"><span><b>${categoryIcon(x.category)} ${esc(x.desc)}</b><small>${formatShortDate(x.date)} · ${esc(x.category)}</small></span><span class="right">${money(x.amount)} MAD<br><button data-delsp="${x.id}">Delete</button></span></div>`).join(''):'<div class="record">No purchases yet.</div>';$$('[data-delsp]').forEach(b=>b.onclick=()=>{month()[type]=month()[type].filter(v=>v.id!==b.dataset.delsp);save();financeForm(type);}); }
+
+  function openLedger(){ const t=totals(); const m=month(); const rows=[...m.market.map(x=>({...x,t:'Market'})),...m.big.map(x=>({...x,t:'Big Purchase'})),...m.fixed.map(x=>({...x,t:'Fixed Charge'})),...m.income.map(x=>({...x,date:x.receivedDate||x.date,t:x.received?'Income received':'Income expected'}))].sort((a,b)=>(b.date||'').localeCompare(a.date||'')); openSheet('Ledger',`<div class="record"><span>Received income</span><span class="right">${money(t.received)} MAD</span></div><div class="record"><span>Commitments</span><span class="right">${money(t.fixed)} MAD</span></div><div class="record"><span>Spending</span><span class="right">${money(t.spending)} MAD</span></div><div class="record"><span><b>Gold Left</b></span><span class="right"><b>${money(t.gold)} MAD</b></span></div><div class="recordList">${rows.length?rows.map(x=>`<div class="record"><span><b>${esc(x.t)}</b> · ${esc(x.desc)}<small>${formatShortDate(x.date)}</small></span><span class="right">${money(x.amount)} MAD</span></div>`).join(''):'No ledger entries.'}</div>`); }
+
+  function changeMonth(){ openSheet('Change Month',`<div class="field"><label>Active month</label><input type="month" id="monthInput" value="${state.activeMonth}"></div><div class="actionsRow"><button class="primary" id="setMonth">Open month</button></div>`); $('#setMonth').onclick=()=>{const v=$('#monthInput').value;if(v){state.activeMonth=v;if(!state.months[v])state.months[v]=blankMonth();save();closeSheet();toast('Month changed');}}; }
+
+  function settings(){ openSheet('Settings & Backup',`<p>Data is stored locally on this device.</p><div class="actionsRow"><button class="primary" id="backupJson">Export backup</button><button class="secondary" id="importJson">Import backup</button></div><input type="file" id="backupFile" accept="application/json" hidden><div class="actionsRow"><button class="danger" id="resetAll">Reset all data</button></div>`); $('#backupJson').onclick=exportBackup;$('#importJson').onclick=()=>$('#backupFile').click();$('#backupFile').onchange=importBackup;$('#resetAll').onclick=()=>{if(confirm('Reset all The Way data on this device?')){state=blankState();save();closeSheet();toast('Data reset');}}; }
+  function exportBackup(){ const blob=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); shareOrDownload(blob,`the-way-backup-${today()}.json`,'The Way backup'); }
+  function importBackup(e){ const f=e.target.files[0];if(!f)return;const r=new FileReader();r.onload=()=>{try{const parsed=JSON.parse(r.result);state=Object.assign(blankState(),parsed);save();closeSheet();toast('Backup imported');}catch{toast('That backup could not be read');}};r.readAsText(f); }
+
+  function openQuestPuzzle(){ openSheet('The Box — The First Lock',`<div class="questStory"><p><b>Tangier · Main Quest · Chapter I</b></p><p>Inside your father's box is a lock made from four symbols. A margin note gives the order:</p><p><em>Moon → Gate → Star → Wave</em></p></div><div class="puzzleBox"><b>Press the four symbols in order.</b><div class="symbolGrid"><button class="symbol" data-symbol="moon">☾</button><button class="symbol" data-symbol="gate">⌂</button><button class="symbol" data-symbol="star">✦</button><button class="symbol" data-symbol="wave">≈</button></div><div class="sequence" id="puzzleSequence">${puzzleSeq.length?puzzleSeq.map(symbolGlyph).join(' → '):'—'}</div><button class="primary" id="unlockBox" style="width:100%;margin-top:10px">Unlock the Box</button><div class="reward">${state.puzzleDone?'Completed — Father’s Fragment I recovered.':'Reward: +100 XP · +1 Relic Token · Father’s Fragment I'}</div></div>`,'questModal'); $$('.symbol').forEach(b=>b.onclick=()=>{if(state.puzzleDone)return toast('This lock is already solved');puzzleSeq.push(b.dataset.symbol);if(puzzleSeq.length>4)puzzleSeq.shift();$('#puzzleSequence').textContent=puzzleSeq.map(symbolGlyph).join(' → ');}); $('#unlockBox').onclick=()=>{if(state.puzzleDone)return toast('Reward already claimed');if(puzzleSeq.join(',')==='moon,gate,star,wave'){state.puzzleDone=true;state.xp=(state.xp||0)+100;state.relics=(state.relics||0)+1;state.fragment=true;puzzleSeq=[];save();openQuestPuzzle();toast('Box unlocked — Level up!');}else{puzzleSeq=[];$('#puzzleSequence').textContent='—';toast('The lock resets');}}; }
+  function symbolGlyph(s){return ({moon:'☾',gate:'⌂',star:'✦',wave:'≈'})[s]||'?';}
+  function infoSheet(title,text){ openSheet(title,`<p style="line-height:1.55">${text}</p>`); }
+
+  function exportPdf(){
+    const t=totals(),m=month(); const lines=[
+      'THE WAY - MONTHLY FINANCIAL REPORT',monthLabel(state.activeMonth),'',
+      `Income expected: ${money(t.expected)} MAD`,`Income received: ${money(t.received)} MAD`,`Fixed commitments: ${money(t.fixed)} MAD`,`Market spending: ${money(t.market)} MAD`,`Big purchases: ${money(t.big)} MAD`,`Gold Left: ${money(t.gold)} MAD`,'',
+      'INCOME',...m.income.map(x=>`${x.receivedDate||x.date} | ${x.desc} | ${money(x.amount)} MAD | ${x.received?'RECEIVED':'EXPECTED'}`),'',
+      'FIXED CHARGES',...m.fixed.map(x=>`${x.date} | ${x.desc} | ${money(x.amount)} MAD`),'',
+      'MARKET PURCHASES',...m.market.map(x=>`${x.date} | ${x.desc} | ${x.category} | ${money(x.amount)} MAD`),'',
+      'BIG PURCHASES',...m.big.map(x=>`${x.date} | ${x.desc} | ${x.category} | ${money(x.amount)} MAD`)
+    ];
+    const bytes=buildSimplePdf(lines); const blob=new Blob([bytes],{type:'application/pdf'}); shareOrDownload(blob,`The-Way-${state.activeMonth}.pdf`,'The Way monthly report');
+  }
+  function ascii(s){return String(s).normalize('NFD').replace(/[\u0300-\u036f]/g,'').replace(/[^\x20-\x7E]/g,'?').replace(/\\/g,'\\\\').replace(/\(/g,'\\(').replace(/\)/g,'\\)');}
+  function buildSimplePdf(lines){
+    const perPage=46; const pages=[]; for(let i=0;i<lines.length;i+=perPage)pages.push(lines.slice(i,i+perPage)); if(!pages.length)pages.push(['The Way']);
+    const objs=[]; const pageRefs=[]; const fontObj=3+pages.length*2;
+    objs[1]='<< /Type /Catalog /Pages 2 0 R >>';
+    pages.forEach((pg,i)=>{const pageObj=3+i*2, contentObj=4+i*2;pageRefs.push(`${pageObj} 0 R`);let y=795;const content=['BT','/F1 11 Tf','14 TL'];pg.forEach((line,idx)=>{const size=idx===0?16:idx===1?13:10.5;content.push(`/F1 ${size} Tf`);content.push(`50 ${y} Td (${ascii(line)}) Tj`);content.push(`${-50} ${-(idx===0?24:idx===1?22:15)} Td`);y-=idx===0?24:idx===1?22:15;});content.push('ET');const stream=content.join('\n');objs[contentObj]=`<< /Length ${stream.length} >>\nstream\n${stream}\nendstream`;objs[pageObj]=`<< /Type /Page /Parent 2 0 R /MediaBox [0 0 595 842] /Resources << /Font << /F1 ${fontObj} 0 R >> >> /Contents ${contentObj} 0 R >>`;});
+    objs[2]=`<< /Type /Pages /Kids [${pageRefs.join(' ')}] /Count ${pages.length} >>`; objs[fontObj]='<< /Type /Font /Subtype /Type1 /BaseFont /Helvetica >>';
+    let pdf='%PDF-1.4\n';const offsets=[0];for(let i=1;i<=fontObj;i++){offsets[i]=pdf.length;pdf+=`${i} 0 obj\n${objs[i]}\nendobj\n`;}const xref=pdf.length;pdf+=`xref\n0 ${fontObj+1}\n0000000000 65535 f \n`;for(let i=1;i<=fontObj;i++)pdf+=`${String(offsets[i]).padStart(10,'0')} 00000 n \n`;pdf+=`trailer\n<< /Size ${fontObj+1} /Root 1 0 R >>\nstartxref\n${xref}\n%%EOF`;return new TextEncoder().encode(pdf);
+  }
+  async function shareOrDownload(blob,name,title){ try{const file=new File([blob],name,{type:blob.type});if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title});return;}}catch(e){} const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=name;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove();},1200); }
+
+  // Finance click wiring
+  $('#hMarket').onclick=()=>travelThen('market',()=>financeForm('market')); $('#hSpotMarket').onclick=$('#hMarket').onclick;
+  $('#hBig').onclick=()=>travelThen('big',()=>financeForm('big')); $('#hSpotBig').onclick=$('#hBig').onclick;
+  $('#hIncome').onclick=()=>travelThen('income',()=>financeForm('income')); $('#hSpotIncome').onclick=$('#hIncome').onclick;
+  $('#hFixed').onclick=()=>travelThen('fixed',()=>financeForm('fixed')); $('#hSpotFixed').onclick=$('#hFixed').onclick;
+  $('#hSpotLedger').onclick=()=>travelThen('ledger',openLedger); $('#hSpotVillage').onclick=()=>{setRoute('village');toast('Village');};
+  $('#hPdf').onclick=exportPdf; $('#hBackup').onclick=settings; $('#hMonth').onclick=changeMonth;
+  $('#hNavWay').onclick=()=>showScreen('wayScreen'); $('#hNavFinance').onclick=()=>showScreen('financeScreen'); $('#hNavSettings').onclick=settings; $('#hNavActivity').onclick=()=>{window.scrollTo({top:document.body.scrollHeight*.65,behavior:'smooth'});}; $('#hNavVillage').onclick=()=>{setRoute('village');window.scrollTo({top:0,behavior:'smooth'});};
+
+  // The Way exact screen wiring
+  $('#hWayPortrait').onclick=()=>showScreen('financeScreen'); $('#hViewDetails').onclick=openQuestPuzzle; $('#hQuest').onclick=openQuestPuzzle;
+  $('#hSkills').onclick=()=>infoSheet('Skills','Skills will unlock as Issam completes boxes and deciphers relics. The first quest currently contains the only playable puzzle in this build.');
+  $('#hItems').onclick=()=>infoSheet('Items',state.fragment?'Father’s Fragment I has been recovered from the first box.':'No key quest items recovered yet.');
+  $('#hEquipment').onclick=()=>infoSheet('Equipment','Equipment progression is reserved for later quests.');
+  $('#hStatus').onclick=()=>infoSheet('Status',`Level ${Math.floor((state.xp||0)/100)+1} · ${state.xp||0} XP · ${state.relics||0} Relic Token${state.relics===1?'':'s'}`);
+  $('#hMap').onclick=()=>toast('World map — Tangier is the current location'); $('#hWorldMap').onclick=$('#hMap').onclick; $('#hLocalMap').onclick=()=>toast('Local Tangier map will unlock with the next quest');
+  $('#hLore').onclick=()=>infoSheet('Lore','The war left records fragmented and contradictory. Issam’s father spent years tracing a hidden sequence of boxes across Morocco. The first truth begins in Tangier.');
+
+  window.addEventListener('popstate',()=>{ if($('#wayScreen').classList.contains('active'))showScreen('financeScreen'); });
+  
+  render();
+})();
+</script>
+
+<script>
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => navigator.serviceWorker.register('./sw.js').catch(()=>{}));
+}
+</script>
+
+</body>
+</html>

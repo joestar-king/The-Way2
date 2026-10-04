@@ -1,0 +1,1 @@
+Upload every file in this folder to the ROOT of your GitHub Pages repository. In Settings > Pages choose main branch and /(root).
